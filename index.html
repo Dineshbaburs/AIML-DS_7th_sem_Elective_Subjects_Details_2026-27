@@ -1,0 +1,1234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CHRIST University — AIML & DS Portal</title>
+
+  <!-- GOOGLE FONTS -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <!-- BOOTSTRAP -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- SELECT2 -->
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+  <!-- JS DEPENDENCIES -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js" defer></script>
+
+  <!-- jsPDF for PDF Receipt -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+
+<style>
+  body { 
+      background:#eef0ff; 
+      font-family:'Inter',sans-serif; 
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      margin: 0;
+    }
+
+    .wrap { 
+      max-width:1100px; 
+      margin:25px auto; 
+      width: 100%;
+      flex: 1;
+    }
+
+    .header {
+      background:white; padding:20px; border-radius:16px;
+      border-left:6px solid #4b2e83;
+      box-shadow:0 6px 25px rgba(0,0,0,0.1);
+    }
+    .portal {
+      background:white; padding:25px; border-radius:18px;
+      margin-top:20px; box-shadow:0 8px 25px rgba(0,0,0,0.08);
+    }
+    /* FIX TAB DESIGN (restore original look) */
+#mainTabs .nav-link {
+  background: #ffffff !important;
+  color:#0E6FFD !important;
+  border: 2px solid #0E6FFD !important;
+  border-radius: 10px !important;
+  margin-right: 6px;
+  font-weight: 600;
+}
+
+#mainTabs .nav-link.active {
+  background: #0E6FFD !important;
+  color: white !important;
+  border-color: #0E6FFD !important;
+}
+/* Make inactive tab light */
+#mainTabs .nav-link:not(.active) {
+    background: #ffffff !important;
+    color: #0E6FFD !important;
+    opacity: 0.55;
+}
+
+
+    /* STEP 1 HEADER LIKE GOOGLE FORM */
+    .section-title {
+      background:#673ab7;
+      color:white;
+      padding:16px 22px;
+      border-radius:18px 18px 0 0;
+      font-weight:700;
+      margin-bottom:0;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      font-size:18px;
+    }
+    .section-title::before {
+      content: none;
+    }
+
+    /* STEP 1 TABLE CONTAINER */
+    .info-table{
+      background:#f7f3ff;
+      border-radius:0 0 18px 18px;
+      border:1px solid #ded1ff;
+      border-top:none;
+      overflow:hidden;
+      margin-bottom:18px;
+    }
+    .info-row{
+      display:flex;
+      border-top:1px solid #e3d7ff;
+    }
+    .info-row:first-child{
+      border-top:none;
+    }
+    .info-label-cell{
+      width:28%;
+      min-width:220px;
+      background:#f3eaff;
+      padding:14px 18px;
+      font-weight:600;
+      font-size:14px;
+      display:flex;
+      align-items:center;
+      border-right:1px solid #e3d7ff;
+    }
+    .info-value-cell{
+      flex:1;
+      padding:10px 18px;
+      background:#faf6ff;
+      display:flex;
+      align-items:center;
+    }
+
+    .info-value-cell .form-select,
+    .info-value-cell .form-control{
+      width:100%;
+      border-radius:8px;
+      font-size:14px;
+      padding:8px 10px;
+    }
+
+    .hidden { display:none !important; }
+    .req { color:red; font-weight:bold; }
+    .instr {
+      font-size:13px; color:#555; background:#eee8ff;
+      padding:10px 14px; border-radius:10px;
+      border-left:4px solid #4b2e83; margin-bottom:15px;
+    }
+
+    /* BLUE TOP STRIP */
+    .topbar {
+      background: #004a8f;
+      color: white;
+      width: 100%;
+      padding: 7px 0;
+      text-align: center;
+      font-size: 15px;
+      font-weight: 600;
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 9999;
+    }
+
+    /* MAIN HEADER */
+    .main-header {
+      background: white;
+      width: 100%;
+      position: fixed;
+      top: 35px;
+      left: 0;
+      z-index: 9998;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+      padding: 10px 0;
+    }
+
+    /* INNER FLEX CONTAINER */
+    .header-inner {
+      max-width: 1250px;
+      margin: auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 25px;
+    }
+
+    /* LOGOS */
+    .cu-logo { height: 70px; }
+    .center-logo { height: 55px; }
+    .dept-logo { height: 75px; }
+
+    /* Fix page overlap when header is fixed */
+    .header-space {
+      height: 140px;
+    }
+
+    /* UPDATED FOOTER (ONLY CHANGE YOU ASKED FOR) */
+   footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: #4b2e83;
+    color: white;
+    text-align: center;
+    padding: 15px 0;
+    font-size: 14px;
+    font-weight: 500;
+    z-index: 9999;
+    box-shadow: 0 -3px 10px rgba(0,0,0,0.25);
+}
+body {
+    padding-bottom: 80px !important;
+}
+
+    /* Select2 styling */
+    .select2-container--default .select2-search--dropdown .select2-search__field {
+      border: 1px solid #ced4da !important;
+      border-radius: 6px !important;
+      padding: 8px 12px 8px 32px !important;
+      font-size: 15px !important;
+      outline: none !important;
+      background-color: #fff !important;
+      background-image: url('https://cdn-icons-png.flaticon.com/512/54/54481.png');
+      background-size: 16px;
+      background-repeat: no-repeat;
+      background-position: 8px center;
+    }
+
+    .select2-container--default .select2-search--dropdown .select2-search__field:focus {
+      border-color: #86b7fe !important;
+      box-shadow: 0 0 0 4px rgba(13,110,253,0.25) !important;
+    }
+
+    /* Submit button */
+    .btn-submit-green {
+      background-color: #198754 !important;
+      color: white !important;
+      font-weight: 600;
+      padding: 10px 25px;
+      border-radius: 6px;
+      border: none;
+      float: right;
+    }
+
+    .btn-submit-green:hover {
+      background-color: #157347 !important;
+    }
+
+    /* STEP 1 NEXT BUTTON */
+    #step1 #toStep2 {
+      background:#673ab7;
+      border:none;
+      border-radius:999px;
+      padding:8px 30px;
+      font-weight:600;
+      font-size:15px;
+    }
+    #step1 #toStep2:hover {
+      background:#5a2fa8;
+    }
+
+    .tabs-fixed-container {
+      position: sticky;
+      top: 140px;
+      background: white;
+      padding-top: 10px;
+      z-index: 9990;
+    }
+
+    /* FULLSCREEN OVERLAY */
+#spinnerOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    backdrop-filter: blur(5px);
+    background: rgba(0, 0, 0, 0.35);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 999999;
+    animation: fadeIn 0.25s ease-out forwards;
+}
+
+/* CONTAINER BOX */
+.spinner-box {
+    background: white;
+    padding: 30px 40px;
+    border-radius: 16px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.20);
+    animation: popIn 0.25s ease-out forwards;
+}
+
+/* SPINNER */
+.spinner {
+    width: 55px;
+    height: 55px;
+    border: 6px solid #dcdcff;
+    border-top-color: #4b2e83;
+    border-radius: 50%;
+    animation: spin 0.9s linear infinite;
+    margin: auto;
+}
+
+/* TEXT BELOW SPINNER */
+.spinner-text {
+    margin-top: 15px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #4b2e83;
+}
+#step2 #goStep3 {
+    background: #673ab7 !important;   /* purple */
+    border-color: #673ab7 !important;
+}
+
+#step2 #goStep3:hover {
+    background: #5a2fa8 !important;   /* darker purple hover */
+    border-color: #5a2fa8 !important;
+}
+/* ANIMATIONS */
+@keyframes spin {
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes popIn {
+    0% { transform: scale(0.85); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+@keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+/* Success Page */
+#successPage {
+    width: 100%;
+    padding-top: 60px;
+    text-align: center;
+}
+
+.success-container {
+    margin-top: 120px;
+}
+
+.success-title {
+    font-size: 32px;
+    font-weight: 700;
+    color: #1b8e3e;
+    margin-top: 20px;
+}
+
+.success-text {
+    color: #444;
+    font-size: 18px;
+    margin-top: 8px;
+}
+
+/* Animated green tick */
+.animated-check {
+    width: 85px;
+    height: 85px;
+    stroke: #1b8e3e;
+    stroke-width: 3;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    animation: checkmark 0.7s ease forwards;
+}
+
+@keyframes checkmark {
+    0% {
+        stroke-dashoffset: 50;
+        stroke-dasharray: 50;
+        opacity: 0;
+    }
+    40% {
+        opacity: 1;
+    }
+    100% {
+        stroke-dashoffset: 0;
+        stroke-dasharray: 50;
+    }
+}
+.portal.hidden{display:none!important;}
+
+/* STEP2 BUTTON ROW — EXACT SAME AS STEP3 */
+#step2 .step2-btn-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 30px;
+    padding: 0 10px;
+}
+
+/* Buttons same size as STEP3 */
+#step2 .step2-btn-row button {
+    width: 160px;
+    height: 45px;
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: 8px;
+}
+
+/* Back button same color as Step3 */
+#step2 #backToStep1 {
+    background: #6c757d;
+    color: white;
+    border: none;
+}
+
+/* Continue button same as Step3 */
+#step2 #goStep2Action {
+    background: #673ab7;
+    border: none;
+    color: white;
+}
+/* --- STEP 2 BUTTON ROW (EXACTLY LIKE YOUR SCREENSHOT) --- */
+
+/* STEP 2 BUTTON ROW — EXACT ALIGNMENT LIKE STEP 3 */
+#step2 .step2-btn-row {
+    width: 100%;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    margin-top: 25px !important;
+    padding: 0 0px !important; /* no side padding → buttons touch edges like Step 3 */
+}
+
+/* BACK BUTTON LEFT */
+#step2 #backToStep1 {
+    width: 110px !important;
+    height: 42px !important;
+    background: #6c757d !important;
+    color: white !important;
+    border-radius: 8px !important;
+    border: none !important;
+    font-size: 15px !important;
+    font-weight: 600 !important;
+    margin-left: 20px !important;  /* same spacing as Step 3 */
+}
+
+/* CONTINUE BUTTON RIGHT */
+#step2 #goStep2Action {
+    width: 130px !important;
+    height: 42px !important;
+    background: #673ab7 !important;
+    color: white !important;
+    border-radius: 8px !important;
+    border: none !important;
+    font-size: 15px !important;
+    font-weight: 600 !important;
+    margin-right: 20px !important; /* same spacing as Step 3 */
+}
+
+#goStep4 {
+    background: #673ab7 !important;
+    border-color: #673ab7 !important;
+    color: #ffffff !important;
+    font-weight: 600 !important;
+    padding: 8px 30px !important;
+    border-radius: 8px !important;
+}
+
+#goStep4:hover {
+    background: #5a2fa8 !important;
+}
+/* ================================
+   TABLE STYLING FOR STEP 5
+================================ */
+#viewResults table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 15px;
+}
+
+#viewResults th,
+#viewResults td {
+    border: 1px solid #d5c8f7;
+    padding: 10px;
+    text-align: left;
+}
+
+#viewResults thead th {
+    background: #e8e0ff;
+    font-weight: 600;
+}
+
+/* No data message */
+.no-data-message {
+    text-align: center;
+    padding: 20px;
+    color: #673ab7;
+    font-weight: 600;
+    background: #f3eaff;
+    border-radius: 10px;
+    margin-top: 15px;
+}
+
+/* ================================
+   SKELETON LOADING
+================================ */
+.skeleton-table {
+    border: 1px solid #d5c8f7;
+    border-radius: 8px;
+    padding: 10px;
+}
+
+.skeleton-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.skeleton-bar {
+    height: 16px;
+    flex: 1;
+    background: linear-gradient(90deg, #eee8ff 25%, #e1d7ff 50%, #eee8ff 75%);
+    background-size: 200% 100%;
+    border-radius: 5px;
+    animation: skeleton-loading 1.2s infinite;
+}
+
+@keyframes skeleton-loading {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+/* =========================================================
+   STEP 5 — FULLY ISOLATED, SAFE, NON-CONFLICTING CSS
+   (Does NOT affect Step 1–4)
+========================================================= */
+
+#step5 {
+    width: 100%;
+}
+
+#step5 .section-title {
+    margin-bottom: 12px !important;
+}
+
+/* Card box for each past submission */
+#step5 .past-card {
+    background: #ffffff;
+    border-radius: 14px;
+    padding: 18px 20px;
+    border: 1px solid #ded1ff;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+    margin-bottom: 25px;
+}
+
+/* Label formatting */
+#step5 .past-card p {
+    margin: 4px 0;
+    font-size: 15px;
+    color: #222;
+}
+
+#step5 .past-card b {
+    color: #000;
+    font-weight: 600;
+}
+
+/* Proof links */
+#step5 .past-card a {
+    color: #0e6ffd;
+    font-weight: 600;
+    text-decoration: none;
+}
+#step5 .past-card a:hover {
+    text-decoration: underline;
+}
+
+/* Download button inside card */
+#step5 .past-card button {
+    width: 230px;
+    margin-top: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 8px;
+}
+
+/* Horizontal separator lines */
+#step5 hr {
+    border: none;
+    border-top: 1px solid #e5d9ff;
+    margin: 15px 0;
+}
+
+/* No-data message */
+#step5 .no-data-message {
+    background: #f3eaff;
+    padding: 20px;
+    border-radius: 12px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 15px;
+    color: #673ab7;
+    border: 1px solid #decfff;
+}
+
+/* Skeleton loader */
+#step5 .skeleton-table {
+    border: 1px solid #d5c8f7;
+    border-radius: 12px;
+    padding: 16px;
+}
+
+#step5 .skeleton-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+#step5 .skeleton-bar {
+    height: 16px;
+    flex: 1;
+    background: linear-gradient(90deg, #eee8ff 25%, #e1d7ff 50%, #eee8ff 75%);
+    background-size: 200% 100%;
+    border-radius: 5px;
+    animation: skeleton-loading 1.2s infinite;
+}
+
+/* Mobile Responsive */
+@media(max-width:600px){
+    #step5 .past-card {
+        padding: 16px;
+    }
+    #step5 .past-card p {
+        font-size: 14px;
+    }
+    #step5 .past-card button {
+        width: 100%;
+    }
+}
+
+/* ================================
+   PAST SUBMISSION CARD STYLES
+   ================================ */
+.past-card {
+    background: #ffffff;
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 22px;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.08);
+}
+
+.past-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 15px;
+    font-size: 15px;
+}
+
+.past-table td {
+    padding: 10px 12px;
+    border: 1px solid #ece9ff;
+}
+
+.past-table .label {
+    background: #f7f3ff;
+    font-weight: 600;
+    width: 30%;
+}
+
+.download-btn {
+    padding: 10px 20px;
+    border: none;
+    background: #1976ff;
+    color: white;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+}
+.download-btn:hover {
+    background: #0e5edd;
+}
+
+
+/* ================================
+   UNIVERSAL APP SPINNER OVERLAY
+   ================================ */
+#appSpinnerOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(6px);
+    background: rgba(0, 0, 0, 0.28);
+    z-index: 999999;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+}
+
+/* ================================
+   SPINNER CONTAINER BOX
+   ================================ */
+.app-spinner-box {
+    width: 330px;
+    padding: 28px 32px;
+    background: #ffffff;
+    border-radius: 18px;
+    text-align: center;
+    box-shadow: 0 12px 38px rgba(0, 0, 0, 0.22);
+    transform: translateY(15px);
+    transition: transform 0.25s ease;
+}
+
+/* ================================
+   CIRCULAR LOADER
+   ================================ */
+.app-spinner {
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    border: 6px solid #dcd6ff;
+    border-top-color: #4b2db7;
+    border-right-color: #4b2db7;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 18px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ================================
+   SPINNER TEXT
+   ================================ */
+.app-spinner-text {
+    font-size: 18px;
+    color: #4b2db7;
+    font-weight: 600;
+}
+
+/* =========================================================
+   ✨ FULL MOBILE OPTIMIZATION (≤600px)
+========================================================= */
+@media(max-width:600px){
+
+  /* --------- GLOBAL --------- */
+  body {
+    padding-bottom: 75px !important;
+    background: #f2f4ff !important;
+  }
+
+  .wrap {
+    margin: 10px !important;
+    padding: 0 !important;
+  }
+
+  .portal {
+    padding: 15px !important;
+    border-radius: 14px !important;
+  }
+
+  /* --------- TOP BLUE STRIP --------- */
+  .topbar {
+    font-size: 12px !important;
+    padding: 4px 0 !important;
+  }
+
+  /* --------- MAIN HEADER --------- */
+  .main-header {
+    padding: 6px 0 !important;
+    top: 28px !important;
+  }
+
+  .header-container {
+    padding: 0 10px !important;
+    justify-content: center !important;
+    gap: 12px !important;
+  }
+
+  .cu-logo,
+  .dept-logo {
+    height: 42px !important;
+  }
+
+  /* --------- HEADER SPACER --------- */
+  .header-space,
+  div[style*="height:140px"] {
+    height: 90px !important;
+  }
+
+  /* --------- TABS --------- */
+  #mainTabs .nav-link {
+    font-size: 12px !important;
+    padding: 6px 10px !important;
+    margin-right: 4px !important;
+  }
+
+  .tabs-fixed-container {
+    top: 95px !important;
+    padding-top: 5px !important;
+  }
+
+  .progress {
+    height: 5px !important;
+  }
+
+  /* --------- SECTION TITLE --------- */
+  .section-title {
+    font-size: 15px !important;
+    padding: 12px 16px !important;
+
+    /* FIX WHITE GAP */
+    margin-bottom: 0 !important;
+    padding-bottom: 10px !important;
+  }
+
+  /* --------- INFO TABLE --------- */
+  .info-label-cell {
+    min-width: 120px !important;
+    width: 38% !important;
+    font-size: 12px !important;
+    padding: 10px !important;
+  }
+
+  .info-value-cell {
+    padding: 8px !important;
+  }
+
+  .form-select,
+  .form-control {
+    font-size: 13px !important;
+    padding: 7px 10px !important;
+  }
+
+  /* --------- RADIO BUTTON CATEGORY --------- */
+  #step2 label {
+    font-size: 14px !important;
+    margin-bottom: 6px !important;
+  }
+
+  /* --------- FILE UPLOAD BOX --------- */
+  .instr {
+    font-size: 12px !important;
+    padding: 8px 12px !important;
+  }
+
+  /* --------- GENERAL BUTTONS --------- */
+  button.btn {
+    padding: 8px 18px !important;
+    font-size: 13px !important;
+  }
+
+  #toStep2,
+  #goStep3 {
+    width: 100% !important;
+    margin-top: 10px;
+  }
+
+  /* --------- STEP 2 BUTTON FIX --------- */
+  #step2 .btn {
+    width: 46% !important;
+  }
+  #step2 #goStep3 {
+    margin-left: auto !important;
+  }
+
+  /* --------- STEP 3 BUTTON FIX --------- */
+  #step3 .backBtn,
+  #step3 .submitBtn {
+    width: 48% !important;
+  }
+
+  /* --------- SUCCESS PAGE --------- */
+  #successPage .success-title {
+    font-size: 22px !important;
+  }
+  #successPage .success-text {
+    font-size: 15px !important;
+  }
+  .animated-check {
+    width: 65px !important;
+    height: 65px !important;
+  }
+
+  #downloadPdfBtn {
+    width: 100% !important;
+    margin-top: 20px !important;
+  }
+  
+  /* --------- FOOTER --------- */
+  footer.footer-bar {
+    font-size: 12px !important;
+    padding: 10px 6px !important;
+    text-align: center !important;
+    bottom: 0 !important;
+  }
+
+  /* Force button container into horizontal row */
+  #step2 button,
+  #step3 button {
+     margin-bottom: 0 !important;
+  }
+
+  #step2,
+  #step3 {
+     display: flex;
+     flex-direction: column;
+     gap: 12px !important;
+  }
+  /* STEP 2 — Only change Continue button color */
+#step2 #goStep3 {
+    background: #673ab7 !important;   /* purple */
+    border-color: #673ab7 !important;
+}
+
+#step2 #goStep3:hover {
+    background: #5a2fa8 !important;   /* darker purple hover */
+    border-color: #5a2fa8 !important;
+}
+
+
+  /* ------------------ PDF RECEIPT BUTTON ------------------ */
+  #downloadPdfBtn {
+    width: 70% !important;
+    padding: 10px 0 !important;
+    font-size: 14px !important;
+    display: block !important;
+    margin: 20px auto !important;
+    border-radius: 8px !important;
+  }
+/* STEP 2 BUTTON FIX — PERFECT ALIGNMENT */
+#step2 .step2-btn-row {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    width: 100% !important;
+    gap: 10px !important;
+    margin-top: 10px !important;
+}
+
+#step2 .step2-btn-row .backBtn,
+#step2 .step2-btn-row .continueBtn {
+    width: 48% !important;
+    height: 46px !important;            /* equal height */
+    padding: 0 !important;              /* remove bootstrap padding */
+    line-height: 46px !important;       /* center the text */
+    font-size: 13px !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;     /* perfect vertical alignment */
+}
+
+
+  /* =======================================================
+     🟪 FIX GAP BETWEEN PURPLE HEADER & CLONE-TABLE
+  ======================================================= */
+  #step2 .clone-table,
+  #step3 .clone-table {
+    margin-top: -12px !important;   
+    border-top: none !important;
+  }
+
+  #step2 .catForm,
+  #step3 .catForm {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+  }
+
+} /* END MOBILE */
+
+
+
+/* =========================================================
+   NON-MOBILE GLOBAL (shared)
+========================================================= */
+
+/* Lavender Input Style */
+.unified-input,
+.form-control,
+.form-select {
+    background: #faf6ff !important;
+    border: 1px solid #ded1ff !important;
+    border-radius: 10px !important;
+    padding: 10px 12px !important;
+    box-shadow: none !important;
+}
+
+/* Lavender Box */
+.clone-table {
+    background:#f7f3ff;
+    border-radius:0 0 18px 18px;
+    border:1px solid #ded1ff;
+    border-top:none;
+    padding:18px;
+    margin-bottom:18px;
+}
+/* Wrapper to center buttons */
+.submission-btn-wrap {
+    width: 60%;              /* reduce width */
+    margin: 0 auto 12px auto; /* center horizontally + small spacing */
+}
+
+/* Compact button style */
+.sub-btn {
+    width: 100%;
+    padding: 8px 12px !important; 
+    font-size: 14px !important;
+    font-weight: 600;
+    border-radius: 8px !important;
+}
+
+/* Green */
+#btnAddNew.sub-btn {
+    background: #198754 !important;
+    border-color: #198754 !important;
+    color: #fff !important;
+}
+
+/* Purple */
+#btnViewPast.sub-btn {
+    background: #673ab7 !important;
+    border-color: #673ab7 !important;
+    color: white !important;
+}
+
+/* Back button */
+#backToStep1 {
+    width: 60%;
+    margin: 0 auto;
+    padding: 8px 12px !important;
+    font-size: 14px !important;
+    border-radius: 8px !important;
+    display: block;
+}
+
+
+</style>
+</head>
+
+<body>
+
+<div class="wrap">
+
+  <!-- TOP BAR -->
+  <div class="topbar">AIML & DS Students Elective Subjects Details</div>
+
+  <!-- HEADER -->
+  <header class="main-header">
+    <div class="header-container d-flex align-items-center justify-content-between">
+      <img src="culogo.png" class="cu-logo" alt="CHRIST Logo">
+      <img src="Dlogo.png" class="dept-logo" alt="Department Logo">
+    </div>
+  </header>
+
+  <div style="height:140px;"></div>
+
+ <!-- SUCCESS PAGE -->
+<div id="successPage" class="hidden">
+    <div class="success-container">
+
+        <!-- ✔ Animated Tick -->
+        <svg class="animated-check" viewBox="0 0 24 24">
+            <path d="M20 6L9 17l-5-5"></path>
+        </svg>
+
+        <h2 class="success-title">Submission Successful</h2>
+        <p class="success-text">Your  details have been recorded successfully.</p>
+
+        <!-- ✔ Hidden Submission ID (filled dynamically in JS) -->
+        <span id="success_submissionId" style="display:none;"></span>
+
+        <!-- ✔ Show this after record arrives -->
+        <button id="downloadPdfBtn" class="btn btn-primary hidden">
+            Download response PDF
+        </button>
+    </div>
+</div>
+
+<footer class="footer-bar">
+  © CHRIST (Deemed to be University) 2025 | Website Developed for Academic Purposes
+</footer>
+
+
+<!-- GLOBAL SPINNER (used everywhere) -->
+<div id="appSpinnerOverlay">
+    <div class="app-spinner-box">
+        <div class="app-spinner"></div>
+        <p class="app-spinner-text">Loading…</p>
+    </div>
+</div>
+
+
+<!-- PORTAL -->
+<div class="portal">
+
+<div class="tabs-fixed-container">
+  <ul class="nav nav-pills mb-3" id="mainTabs">
+    <li class="nav-item">
+        <button class="nav-link active" data-step="1">Student Info</button>
+    </li>
+    <li class="nav-item">
+        <button class="nav-link" data-step="2">Elective Subjects</button>
+    </li>
+</ul>
+
+
+  <div class="progress mb-4" style="height:8px;">
+    <div class="progress-bar" style="width:0%"></div>
+  </div>
+</div>
+
+<!-- =====================
+     STEP 1 — STUDENT INFO
+======================= -->
+<div class="panel" id="step1">
+
+  <div class="section-title">Student Information</div>
+
+  <div class="info-table">
+
+    <div class="info-row">
+      <div class="info-label-cell">Select your Section <span class="req">*</span></div>
+      <div class="info-value-cell">
+        <select id="sectionSelect" class="form-select">
+          <option value="">Choose section</option>
+
+          <!-- all your section list preserved exactly -->
+
+          <option value="6BT AIML">6BT AIML</option>
+          <option value="6BTCS AIML A">6BTCS AIML A</option>
+          <option value="6BTCS AIML B">6BTCS AIML B</option>
+          <option value="6BTCS AIML C">6BTCS AIML C</option>
+          <option value="6BTCS DS">6BTCS DS</option>
+
+        </select>
+      </div>
+    </div>
+
+    <div class="info-row">
+      <div class="info-label-cell">Student Reg.No and Name <span class="req">*</span></div>
+      <div class="info-value-cell">
+        <select id="studentSelect" class="form-select">
+          <option value="">Select Student</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="info-row">
+      <div class="info-label-cell">Semester</div>
+      <div class="info-value-cell"><input id="sem" class="form-control" readonly></div>
+    </div>
+    
+    <!-- MOBILE HIDDEN FROM UI BUT AVAILABLE IN BACKEND -->
+<input id="mobile" type="hidden">
+
+
+
+
+    <div class="info-row">
+      <div class="info-label-cell">Email</div>
+      <div class="info-value-cell"><input id="email" class="form-control" readonly></div>
+    </div>
+
+    <div class="info-row">
+      <div class="info-label-cell">Academic Year</div>
+      <div class="info-value-cell"><input id="acad_year" class="form-control" readonly></div>
+    </div>
+
+  </div>
+
+  <button class="btn btn-primary ms-auto d-block" id="toStep2">Next →</button>
+
+</div>
+
+
+<!-- =====================
+     STEP 2 — ELECTIVE SUBJECTS
+========================= -->
+<div class="panel hidden" id="step2">
+
+  <div class="section-title">Elective Subject Selection</div>
+
+  <div class="clone-table">
+
+    <!-- PE1 -->
+    <label class="fw-bold">Program Elective Course 1</label>
+    <select class="form-select elective-select" id="pe1_pref1"></select>
+    <select class="form-select elective-select mt-2" id="pe1_pref2"></select>
+    <select class="form-select elective-select mt-2 mb-3" id="pe1_pref3"></select>
+
+    <hr>
+
+    <!-- PE2 -->
+<label class="fw-bold">Program Elective Course 2</label>
+<select class="form-select elective-select" id="pe2_pref1"></select>
+<select class="form-select elective-select mt-2" id="pe2_pref2"></select>
+<select class="form-select elective-select mt-2 mb-3" id="pe2_pref3"></select>
+
+<hr>
+
+<!-- PE3 -->
+<label class="fw-bold">Program Elective Course 3</label>
+<select class="form-select elective-select" id="pe3_pref1"></select>
+<select class="form-select elective-select mt-2" id="pe3_pref2"></select>
+<select class="form-select elective-select mt-2 mb-3" id="pe3_pref3"></select>
+
+
+  </div>
+
+  <div class="step2-btn-row">
+      <button class="btn btn-secondary" id="backToStep1">← Back</button>
+      <button class="btn btn-success" id="submitElectives">Submit</button>
+  </div>
+
+</div>
+</div>
+
+
+</div> <!-- END PORTAL -->
+
+<!-- jsPDF main library -->
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<!-- jsPDF AutoTable plugin -->
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+
+<!-- BOOTSTRAP JS -->
+<script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- MAIN JS -->
+<script defer src="main.js"></script>
+
+</body>
+</html>
