@@ -2,7 +2,7 @@
    🔧 CONFIGURATION
 ====================================== */
 
-const BASE_API = "https://script.google.com/macros/s/AKfycbxlLG34R0I7FRFoyV154lTnxQU1p9pIZzjuSfgTBojeEi2BTEuq4Oyy5zHhs82ZEpVr/exec";
+const BASE_API = "https://script.google.com/macros/s/AKfycbyrLPnc-8AB2tJyZjepK4QSvlJYk9Zqezai11VjjVAydNKt3LmZWpejETD5wll-IRLS/exec";
 const STUDENT_API = BASE_API + "?type=students";
 const SUBJECT_API = BASE_API + "?type=subjects";
 const SAVE_API    = BASE_API;
@@ -26,7 +26,6 @@ function hideSpinner() {
     overlay.style.opacity="0";
     setTimeout(()=> overlay.style.display="none",200);
 }
-
 
 /* ======================================
    🔄 NAVIGATION
@@ -300,27 +299,99 @@ function showSuccessPage(data){
 
 
 /* ======================================
-   📄 GENERATE PDF
+   📄 GENERATE PDF (UPDATED)
 ====================================== */
 
-function generatePDF(data){
+async function generatePDF(data){
 
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
 
+    /* ---------------------------------------
+       PAGE BORDER (BLACK)
+    --------------------------------------- */
+    doc.setDrawColor(0, 0, 0);   // 🔥 Black border
+    doc.setLineWidth(0.8);
+    doc.rect(12, 12, 186, 273);
+
+    /* ---------------------------------------
+       LOGOS
+    --------------------------------------- */
+    const cuLogo = "culogo.png";
+    const deptLogo = "Dlogo.png";
+
+    try {
+        doc.addImage(cuLogo, "PNG", 15, 15, 30, 20);
+        doc.addImage(deptLogo, "PNG", 165, 15, 30, 22);
+    } catch(e){
+        console.warn("Logo not loaded");
+    }
+
+    /* ---------------------------------------
+       HEADER
+    --------------------------------------- */
+    doc.setFont("helvetica", "bold");
     doc.setFontSize(16);
-    doc.text("Elective Subjects Response",20,20);
+    doc.text("CHRIST (Deemed to be University)", 105, 25, { align: "center" });
 
+    doc.setFontSize(13);
+    doc.text("AIML & DS Elective Subjects Submission", 105, 33, { align: "center" });
+
+    doc.setDrawColor(150);
+    doc.line(15, 40, 195, 40);
+
+    /* ---------------------------------------
+       STUDENT DETAILS
+    --------------------------------------- */
     doc.setFontSize(12);
-    doc.text(`Student: ${data.name}`,20,35);
-    doc.text(`PEC1: ${data.pe1_1}, ${data.pe1_2}, ${data.pe1_3}`,20,50);
-    doc.text(`PEC2: ${data.pe2_1}, ${data.pe2_2}, ${data.pe2_3}`,20,65);
-    doc.text(`PEC3: ${data.pe3_1}, ${data.pe3_2}, ${data.pe3_3}`,20,80);
+    doc.setFont("helvetica", "normal");
 
-    doc.save("Elective_Subjects_response.pdf");
+    const now = new Date();
+    const timestamp = now.toLocaleString();  // 🔥 Full date + time
+
+    doc.text(`Register No & Name: ${data.name}`, 20, 50);
+    doc.text(`Section: ${qs("#sectionSelect").value}`, 20, 58);  // 🔥 ADDED
+    doc.text(`Semester: ${qs("#sem").value}`, 20, 66);
+    doc.text(`Academic Year: ${qs("#acad_year").value}`, 20, 74);
+    doc.text(`Email: ${qs("#email").value}`, 20, 82);
+    doc.text(`Submitted On: ${timestamp}`, 20, 90);  // 🔥 Full timestamp
+
+    /* ---------------------------------------
+       ELECTIVE TABLE (UNCHANGED)
+    --------------------------------------- */
+    doc.autoTable({
+        startY: 105,
+        head: [["Course", "Preference 1", "Preference 2", "Preference 3"]],
+        body: [
+            ["PEC1", data.pe1_1, data.pe1_2, data.pe1_3],
+            ["PEC2", data.pe2_1, data.pe2_2, data.pe2_3],
+            ["PEC3", data.pe3_1, data.pe3_2, data.pe3_3]
+        ],
+        theme: "grid",
+        headStyles: {
+            fillColor: [75, 45, 183],
+            textColor: 255,
+            fontStyle: "bold"
+        },
+        styles: {
+            halign: "center"
+        }
+    });
+
+    /* ---------------------------------------
+       FOOTER
+    --------------------------------------- */
+    doc.setFontSize(10);
+    doc.setTextColor(100);
+    doc.text(
+        "This is a system generated confirmation of elective subjects selection.",
+        105,
+        280,
+        { align: "center" }
+    );
+
+    doc.save("Elective_Subjects_Response.pdf");
 }
-
-
 /* ======================================
    🚀 INITIAL LOAD
 ====================================== */
