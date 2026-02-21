@@ -2,10 +2,11 @@
    🔧 CONFIGURATION
 ====================================== */
 
-const BASE_API = "https://script.google.com/macros/s/AKfycbyrLPnc-8AB2tJyZjepK4QSvlJYk9Zqezai11VjjVAydNKt3LmZWpejETD5wll-IRLS/exec";
-const STUDENT_API = BASE_API + "?type=students";
-const SUBJECT_API = BASE_API + "?type=subjects";
-const SAVE_API    = BASE_API;
+const BASE_API = "https://script.google.com/macros/s/AKfycbzCKBHbkzcpT62RVVIRpgHEMYhBOJ74wYT3kmi6C1YdwFG-LXlU9t_A3TSuFyVvlZQp/exec";
+const STUDENT_API   = BASE_API + "?type=students";
+const SUBJECT_API   = BASE_API + "?type=subjects";
+const SUBMITTED_API = BASE_API + "?type=submitted";   // ✅ ADDED
+const SAVE_API      = BASE_API;
 
 const qs  = s => document.querySelector(s);
 
@@ -107,19 +108,33 @@ qs("#sectionSelect").addEventListener("change", async ()=>{
     showSpinner("Loading students...");
 
     try{
+
+        // ✅ GET ALL STUDENTS
         const res = await fetch(`${STUDENT_API}&section=${encodeURIComponent(section)}`);
         const data = await res.json();
+
+        // ✅ GET SUBMITTED REGISTER NUMBERS
+        const submittedRes = await fetch(SUBMITTED_API);
+        const submittedRegs = await submittedRes.json();
 
         qs("#studentSelect").innerHTML =
             `<option value="">Select Student</option>`;
 
         data.forEach(s=>{
+
             const opt = document.createElement("option");
             opt.value = s.reg;
             opt.textContent = `${s.reg} - ${s.name}`;
             opt.dataset.sem   = s.sem;
             opt.dataset.email = s.email;
             opt.dataset.acad  = s.acad_year;
+
+            // ✅ DISABLE IF ALREADY SUBMITTED
+            if(submittedRegs.includes(s.reg)){
+                opt.disabled = true;
+                opt.textContent += " (Already Submitted)";
+            }
+
             qs("#studentSelect").appendChild(opt);
         });
 
@@ -127,7 +142,6 @@ qs("#sectionSelect").addEventListener("change", async ()=>{
 
     hideSpinner();
 });
-
 
 /* ======================================
    🧾 AUTO FILL
