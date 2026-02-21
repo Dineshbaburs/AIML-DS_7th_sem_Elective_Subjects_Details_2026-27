@@ -322,7 +322,7 @@ async function generatePDF(data){
 
     try {
         doc.addImage(cuLogo, "PNG", 15, 15, 30, 20);
-        doc.addImage(deptLogo, "PNG", 165, 15, 28, 22);
+        doc.addImage(deptLogo, "PNG", 165, 15, 26, 22);
     } catch(e){
         console.warn("Logo not loaded");
     }
