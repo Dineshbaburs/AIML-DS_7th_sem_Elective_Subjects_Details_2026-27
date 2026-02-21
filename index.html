@@ -262,7 +262,7 @@ to{stroke-dashoffset:0;}
 }
 
 /* =========================================
-   ✅ PERFECT MOBILE UI (LIKE OLD VERSION)
+   ✅ MOBILE — KEEP SIDE BY SIDE (FIXED)
 ========================================= */
 @media(max-width:600px){
 
@@ -275,71 +275,93 @@ margin:12px;
 }
 
 .portal{
-padding:18px;
+padding:16px;
 border-radius:16px;
 }
 
 .tabs-fixed-container{
-padding:15px;
+padding:12px;
 border-radius:16px;
-margin-bottom:20px;
+margin-bottom:18px;
 }
 
 #mainTabs .nav-link{
-font-size:14px!important;
-padding:8px 14px!important;
+font-size:13px!important;
+padding:8px 12px!important;
 }
 
-.section-title{
-font-size:16px;
-padding:14px 18px;
+/* 🔥 HEADER HEIGHT REDUCED ONLY */
+.topbar{
+font-size:12px;
+padding:4px 0;
 }
 
+.main-header{
+top:28px;
+padding:6px 0;
+}
+
+.cu-logo{
+height:45px;
+}
+
+.dept-logo{
+height:50px;
+}
+
+/* Adjust spacer below header */
+div[style*="height:140px"]{
+height:90px !important;
+}
+
+/* 🔥 KEEP ROW HORIZONTAL */
 .info-row{
-flex-direction:column;
+flex-direction:row;   /* SIDE BY SIDE */
 }
 
+/* Make left label smaller width on mobile */
 .info-label-cell{
-width:100%;
+width:40%;
 min-width:unset;
-border-right:none;
-border-bottom:1px solid #e3d7ff;
-font-size:14px;
-padding:12px 14px;
+font-size:13px;
+padding:12px;
 }
 
+/* Make input take remaining width */
 .info-value-cell{
-width:100%;
-padding:12px 14px;
+width:60%;
+padding:10px 12px;
 }
 
 .form-select,.form-control{
 width:100%;
 font-size:14px;
-padding:10px 14px;
-border-radius:14px;
+padding:8px 12px;
+border-radius:12px;
 }
 
 .step2-btn-row{
 flex-direction:row;
-gap:12px;
+gap:10px;
 }
 
 .step2-btn-row button{
 width:48%;
-height:44px;
+height:42px;
 }
 
 .clone-table{
-padding:16px;
+padding:14px;
 }
 
 footer{
 font-size:12px;
-padding:12px 8px;
+padding:10px 6px;
 }
 
 }
+
+
 </style>
 </head>
 
