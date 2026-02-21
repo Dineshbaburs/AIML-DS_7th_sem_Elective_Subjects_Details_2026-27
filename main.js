@@ -2,7 +2,7 @@
    🔧 CONFIGURATION
 ====================================== */
 
-const BASE_API = "https://script.google.com/macros/s/AKfycbzCKBHbkzcpT62RVVIRpgHEMYhBOJ74wYT3kmi6C1YdwFG-LXlU9t_A3TSuFyVvlZQp/exec";
+const BASE_API = "https://script.google.com/macros/s/AKfycbyMvpAMbxTaUFkfT22D7HuhcnKTp8bWWLq0nnm9RfW0Vp6ivRvKQOwhTdn1nRTL5O2iFQ/exec";
 const STUDENT_API   = BASE_API + "?type=students";
 const SUBJECT_API   = BASE_API + "?type=subjects";
 const SUBMITTED_API = BASE_API + "?type=submitted";   // ✅ ADDED
@@ -130,7 +130,7 @@ qs("#sectionSelect").addEventListener("change", async ()=>{
             opt.dataset.acad  = s.acad_year;
 
             // ✅ DISABLE IF ALREADY SUBMITTED
-            if(submittedRegs.includes(s.reg)){
+           if(submittedRegs.includes(s.reg.toString().trim().toUpperCase())){
                 opt.disabled = true;
                 opt.textContent += " (Already Submitted)";
             }
