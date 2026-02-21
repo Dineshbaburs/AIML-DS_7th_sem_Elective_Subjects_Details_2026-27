@@ -1,19 +1,13 @@
-/* ======================================
-   🔧 CONFIGURATION
-====================================== */
 
 const BASE_API = "https://script.google.com/macros/s/AKfycbyMvpAMbxTaUFkfT22D7HuhcnKTp8bWWLq0nnm9RfW0Vp6ivRvKQOwhTdn1nRTL5O2iFQ/exec";
 const STUDENT_API   = BASE_API + "?type=students";
 const SUBJECT_API   = BASE_API + "?type=subjects";
-const SUBMITTED_API = BASE_API + "?type=submitted";   // ✅ ADDED
+const SUBMITTED_API = BASE_API + "?type=submitted";   
 const SAVE_API      = BASE_API;
 
 const qs  = s => document.querySelector(s);
 
 
-/* ======================================
-   🌐 SPINNER CONTROL
-====================================== */
 
 function showSpinner(message = "Loading...") {
     const overlay = qs("#appSpinnerOverlay");
@@ -28,34 +22,26 @@ function hideSpinner() {
     setTimeout(()=> overlay.style.display="none",200);
 }
 
-/* ======================================
-   🔄 NAVIGATION
-====================================== */
-
 function show(step){
 
-    // Hide all panels
     document.querySelectorAll(".panel")
         .forEach(p => p.classList.add("hidden"));
 
-    // Show selected panel
+
     qs("#step"+step).classList.remove("hidden");
 
-    // Update active tab
+
     document.querySelectorAll("#mainTabs .nav-link")
         .forEach(btn => btn.classList.remove("active"));
 
     const activeTab = qs(`#mainTabs .nav-link[data-step='${step}']`);
     if(activeTab) activeTab.classList.add("active");
 
-    // Update progress bar
     const progressBar = document.querySelector(".progress-bar");
     progressBar.style.width = (step == 1) ? "50%" : "100%";
 }
 
-/* ======================================
-   ➡ STEP 1 NEXT BUTTON FIX
-====================================== */
+
 
 qs("#toStep2").addEventListener("click", function(){
 
@@ -69,16 +55,14 @@ qs("#toStep2").addEventListener("click", function(){
         return;
     }
 
-    show(2); // go to step 2
+    show(2); 
 });
 
 qs("#backToStep1").addEventListener("click", function(){
-    show(1); // go back to step 1
+    show(1); 
 });
 
-/* ======================================
-   🖱 TAB CLICK HANDLER (FIXED)
-====================================== */
+
 
 document.querySelectorAll("#mainTabs .nav-link")
 .forEach(tab=>{
@@ -96,9 +80,6 @@ document.querySelectorAll("#mainTabs .nav-link")
 });
 
 
-/* ======================================
-   👨‍🎓 LOAD STUDENTS
-====================================== */
 
 qs("#sectionSelect").addEventListener("change", async ()=>{
 
@@ -109,11 +90,11 @@ qs("#sectionSelect").addEventListener("change", async ()=>{
 
     try{
 
-        // ✅ GET ALL STUDENTS
+       
         const res = await fetch(`${STUDENT_API}&section=${encodeURIComponent(section)}`);
         const data = await res.json();
 
-        // ✅ GET SUBMITTED REGISTER NUMBERS
+        
         const submittedRes = await fetch(SUBMITTED_API);
         const submittedRegs = await submittedRes.json();
 
@@ -129,7 +110,7 @@ qs("#sectionSelect").addEventListener("change", async ()=>{
             opt.dataset.email = s.email;
             opt.dataset.acad  = s.acad_year;
 
-            // ✅ DISABLE IF ALREADY SUBMITTED
+            
            if(submittedRegs.includes(s.reg.toString().trim().toUpperCase())){
                 opt.disabled = true;
                 opt.textContent += " (Already Submitted)";
@@ -143,9 +124,6 @@ qs("#sectionSelect").addEventListener("change", async ()=>{
     hideSpinner();
 });
 
-/* ======================================
-   🧾 AUTO FILL
-====================================== */
 
 qs("#studentSelect").addEventListener("change",()=>{
     const opt = qs("#studentSelect").selectedOptions[0];
@@ -154,10 +132,6 @@ qs("#studentSelect").addEventListener("change",()=>{
     qs("#acad_year").value = opt?.dataset.acad  || "";
 });
 
-
-/* ======================================
-   📚 LOAD SUBJECTS
-====================================== */
 
 let subjectData = {};
 
@@ -192,9 +166,6 @@ function loadCategory(category, ids){
 }
 
 
-/* ======================================
-   🚫 GLOBAL DUPLICATE PREVENTION
-====================================== */
 
 const allSelectIds = [
     "pe1_pref1","pe1_pref2","pe1_pref3",
@@ -230,10 +201,6 @@ function preventAllDuplicates(){
 document.addEventListener("change", preventAllDuplicates);
 
 
-/* ======================================
-   💾 SAVE ELECTIVES
-====================================== */
-
 qs("#submitElectives").addEventListener("click", async ()=>{
 
     const btn = qs("#submitElectives");
@@ -259,7 +226,7 @@ qs("#submitElectives").addEventListener("click", async ()=>{
         pe3_3: qs("#pe3_pref3").value
     };
 
-    /* 🔒 MANDATORY VALIDATION */
+   
     if(
         !payload.reg ||
         !payload.pe1_1 || !payload.pe1_2 || !payload.pe1_3 ||
@@ -296,9 +263,6 @@ qs("#submitElectives").addEventListener("click", async ()=>{
 
 });
 
-/* ======================================
-   🎉 SUCCESS PAGE
-====================================== */
 
 function showSuccessPage(data){
 
@@ -312,25 +276,19 @@ function showSuccessPage(data){
 }
 
 
-/* ======================================
-   📄 GENERATE PDF (UPDATED)
-====================================== */
+
 
 async function generatePDF(data){
 
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
 
-    /* ---------------------------------------
-       PAGE BORDER (BLACK)
-    --------------------------------------- */
-    doc.setDrawColor(0, 0, 0);   // 🔥 Black border
+    
+    doc.setDrawColor(0, 0, 0);   
     doc.setLineWidth(0.8);
     doc.rect(12, 12, 186, 273);
 
-    /* ---------------------------------------
-       LOGOS
-    --------------------------------------- */
+    
     const cuLogo = "culogo.png";
     const deptLogo = "Dlogo.png";
 
@@ -341,9 +299,7 @@ async function generatePDF(data){
         console.warn("Logo not loaded");
     }
 
-    /* ---------------------------------------
-       HEADER
-    --------------------------------------- */
+    
     doc.setFont("helvetica", "bold");
     doc.setFontSize(16);
     doc.text("CHRIST (Deemed to be University)", 105, 25, { align: "center" });
@@ -354,25 +310,21 @@ async function generatePDF(data){
     doc.setDrawColor(150);
     doc.line(15, 40, 195, 40);
 
-    /* ---------------------------------------
-       STUDENT DETAILS
-    --------------------------------------- */
+   
     doc.setFontSize(12);
     doc.setFont("helvetica", "normal");
 
     const now = new Date();
-    const timestamp = now.toLocaleString();  // 🔥 Full date + time
+    const timestamp = now.toLocaleString();  
 
     doc.text(`Register No & Name: ${data.name}`, 20, 50);
-    doc.text(`Section: ${qs("#sectionSelect").value}`, 20, 58);  // 🔥 ADDED
+    doc.text(`Section: ${qs("#sectionSelect").value}`, 20, 58);  
     doc.text(`Semester: ${qs("#sem").value}`, 20, 66);
     doc.text(`Academic Year: ${qs("#acad_year").value}`, 20, 74);
     doc.text(`Email: ${qs("#email").value}`, 20, 82);
     doc.text(`Submitted On: ${timestamp}`, 20, 90);  // 🔥 Full timestamp
 
-    /* ---------------------------------------
-       ELECTIVE TABLE (UNCHANGED)
-    --------------------------------------- */
+   
     doc.autoTable({
         startY: 105,
         head: [["Course", "Preference 1", "Preference 2", "Preference 3"]],
@@ -392,9 +344,7 @@ async function generatePDF(data){
         }
     });
 
-    /* ---------------------------------------
-       FOOTER
-    --------------------------------------- */
+    
     doc.setFontSize(10);
     doc.setTextColor(100);
     doc.text(
@@ -406,9 +356,7 @@ async function generatePDF(data){
 
     doc.save("Elective_Subjects_Response.pdf");
 }
-/* ======================================
-   🚀 INITIAL LOAD
-====================================== */
+
 
 document.addEventListener("DOMContentLoaded", ()=>{
     loadSubjects();
