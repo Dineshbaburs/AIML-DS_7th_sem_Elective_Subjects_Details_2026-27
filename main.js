@@ -381,7 +381,6 @@ async function generatePDF(data){
 
     doc.save("Elective_Subjects_Response.pdf");
 }
-
 document.addEventListener("DOMContentLoaded", ()=>{
     loadSubjects();
     show(1);
