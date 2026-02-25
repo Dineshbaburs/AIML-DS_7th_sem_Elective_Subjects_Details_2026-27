@@ -6,8 +6,6 @@ const SAVE_API      = BASE_API;
 
 const qs  = s => document.querySelector(s);
 
-
-
 function showSpinner(message = "Loading...") {
     const overlay = qs("#appSpinnerOverlay");
     overlay.querySelector(".app-spinner-text").textContent = message;
@@ -38,8 +36,6 @@ function show(step){
     progressBar.style.width = (step == 1) ? "50%" : "100%";
 }
 
-
-
 qs("#toStep2").addEventListener("click", function(){
 
     if(!qs("#sectionSelect").value){
@@ -59,8 +55,6 @@ qs("#backToStep1").addEventListener("click", function(){
     show(1); 
 });
 
-
-
 document.querySelectorAll("#mainTabs .nav-link")
 .forEach(tab=>{
     tab.addEventListener("click", function(){
@@ -76,14 +70,11 @@ document.querySelectorAll("#mainTabs .nav-link")
     });
 });
 
-
-
 qs("#sectionSelect").addEventListener("change", async ()=>{
 
     const section = qs("#sectionSelect").value;
     if(!section) return;
 
-    // 🔥 ONLY LOGIC ADDED
     const pec1Block = document.getElementById("pec1Block");
     const pec4Block = document.getElementById("pec4Block");
 
@@ -149,7 +140,7 @@ async function loadSubjects(){
         loadCategory("PEC1", ["pe1_pref1","pe1_pref2","pe1_pref3"]);
         loadCategory("PEC2", ["pe2_pref1","pe2_pref2","pe2_pref3"]);
         loadCategory("PEC3", ["pe3_pref1","pe3_pref2","pe3_pref3"]);
-        loadCategory("PEC4", ["pe4_pref1","pe4_pref2","pe4_pref3"]); // added PEC4
+        loadCategory("PEC4", ["pe4_pref1","pe4_pref2","pe4_pref3"]); 
 
     }catch(e){ console.error(e); }
 }
@@ -172,8 +163,6 @@ function loadCategory(category, ids){
         });
     });
 }
-
-
 
 const allSelectIds = [
     "pe1_pref1","pe1_pref2","pe1_pref3",
@@ -209,8 +198,6 @@ function preventAllDuplicates(){
 }
 
 document.addEventListener("change", preventAllDuplicates);
-
-
 qs("#submitElectives").addEventListener("click", async ()=>{
 
     const btn = qs("#submitElectives");
@@ -224,7 +211,7 @@ qs("#submitElectives").addEventListener("click", async ()=>{
     const payload = {
     reg  : qs("#studentSelect").value,
     name : qs("#studentSelect").selectedOptions[0]?.text || "",
-    section: qs("#sectionSelect").value,   // 🔥 ADD THIS LINE
+    section: qs("#sectionSelect").value,   
 
     pe1_1: qs("#pe1_pref1")?.value || "",
     pe1_2: qs("#pe1_pref2")?.value || "",
@@ -282,7 +269,6 @@ qs("#submitElectives").addEventListener("click", async ()=>{
 
 });
 
-
 function showSuccessPage(data){
 
     document.querySelector(".portal").classList.add("hidden");
@@ -293,10 +279,6 @@ function showSuccessPage(data){
 
     downloadBtn.onclick = ()=> generatePDF(data);
 }
-
-
-
-
 
 async function generatePDF(data){
 
@@ -342,7 +324,7 @@ async function generatePDF(data){
     doc.text(`Email: ${qs("#email").value}`, 20, 82);
     doc.text(`Submitted On: ${timestamp}`, 20, 90);
 
-    // 🔥 Build table dynamically
+    
     let tableBody = [];
 
     if(section === "6BT AIML"){
