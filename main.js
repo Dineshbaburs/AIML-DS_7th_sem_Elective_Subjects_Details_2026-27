@@ -1,10 +1,11 @@
-const BASE_API = "https://script.google.com/macros/s/AKfycbwLIi-v7B-J_t3QkGibDh3qDmFKAz6xEgmmO0bgt0wxQ25_oa-oC64Rok6H_Tx93FJG5g/exec";
+const BASE_API = "https://script.google.com/macros/s/AKfycbz6wh7afmWuTcfbNlbU9NXbXy3WzLh2i8btnYEDDuwBhzszuaYTj7q7O0fe0HbfAFInJg/exec";
 const STUDENT_API   = BASE_API + "?type=students";
 const SUBJECT_API   = BASE_API + "?type=subjects";
 const SUBMITTED_API = BASE_API + "?type=submitted";   
 const SAVE_API      = BASE_API;
 
 const qs  = s => document.querySelector(s);
+
 
 function showSpinner(message = "Loading...") {
     const overlay = qs("#appSpinnerOverlay");
@@ -116,6 +117,9 @@ qs("#sectionSelect").addEventListener("change", async ()=>{
             qs("#studentSelect").appendChild(opt);
         });
 
+        // 🔥 LOAD SUBJECTS BASED ON SECTION
+        await loadSubjects(section);
+
     }catch(e){ console.error(e); }
 
     hideSpinner();
@@ -132,9 +136,10 @@ qs("#studentSelect").addEventListener("change",()=>{
 
 let subjectData = {};
 
-async function loadSubjects(){
+async function loadSubjects(section){
     try{
-        const res = await fetch(SUBJECT_API);
+
+        const res = await fetch(`${SUBJECT_API}&section=${encodeURIComponent(section)}`);
         subjectData = await res.json();
 
         loadCategory("PEC1", ["pe1_pref1","pe1_pref2","pe1_pref3"]);
@@ -198,6 +203,7 @@ function preventAllDuplicates(){
 }
 
 document.addEventListener("change", preventAllDuplicates);
+
 qs("#submitElectives").addEventListener("click", async ()=>{
 
     const btn = qs("#submitElectives");
@@ -209,25 +215,25 @@ qs("#submitElectives").addEventListener("click", async ()=>{
     const section = qs("#sectionSelect").value;
 
     const payload = {
-    reg  : qs("#studentSelect").value,
-    name : qs("#studentSelect").selectedOptions[0]?.text || "",
-    section: qs("#sectionSelect").value,   
+        reg  : qs("#studentSelect").value,
+        name : qs("#studentSelect").selectedOptions[0]?.text || "",
+        section: qs("#sectionSelect").value,   
 
-    pe1_1: qs("#pe1_pref1")?.value || "",
-    pe1_2: qs("#pe1_pref2")?.value || "",
-    pe1_3: qs("#pe1_pref3")?.value || "",
+        pe1_1: qs("#pe1_pref1")?.value || "",
+        pe1_2: qs("#pe1_pref2")?.value || "",
+        pe1_3: qs("#pe1_pref3")?.value || "",
 
-    pe2_1: qs("#pe2_pref1").value,
-    pe2_2: qs("#pe2_pref2").value,
-    pe2_3: qs("#pe2_pref3").value,
+        pe2_1: qs("#pe2_pref1").value,
+        pe2_2: qs("#pe2_pref2").value,
+        pe2_3: qs("#pe2_pref3").value,
 
-    pe3_1: qs("#pe3_pref1").value,
-    pe3_2: qs("#pe3_pref2").value,
-    pe3_3: qs("#pe3_pref3").value,
+        pe3_1: qs("#pe3_pref1").value,
+        pe3_2: qs("#pe3_pref2").value,
+        pe3_3: qs("#pe3_pref3").value,
 
-    pe4_1: qs("#pe4_pref1")?.value || "",
-    pe4_2: qs("#pe4_pref2")?.value || "",
-    pe4_3: qs("#pe4_pref3")?.value || ""
+        pe4_1: qs("#pe4_pref1")?.value || "",
+        pe4_2: qs("#pe4_pref2")?.value || "",
+        pe4_3: qs("#pe4_pref3")?.value || ""
     };
 
     if(
@@ -279,6 +285,8 @@ function showSuccessPage(data){
 
     downloadBtn.onclick = ()=> generatePDF(data);
 }
+
+
 
 async function generatePDF(data){
 
@@ -363,6 +371,7 @@ async function generatePDF(data){
 
     doc.save("Elective_Subjects_Response.pdf");
 }
+
 document.addEventListener("DOMContentLoaded", ()=>{
     loadSubjects();
     show(1);
